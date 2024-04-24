@@ -1,0 +1,86 @@
+﻿@inject IApiService ApiService
+
+<!-- Button to trigger the modal -->
+@* <button type="button" class="far fa-play-circle nav-link @ShowModalClass" data-toggle="modal" data-target="#videoModal" @onclick="OnClickGetMovie"></button> *@
+<button type="button" class="far fa-play-circle nav-link" data-toggle="modal" data-target="#videoModal" @onclick="OnClickGetMovie"></button>
+
+
+<!-- The modal -->
+<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                @if(Movie.Title != null)
+                {
+                    Console.WriteLine(Movie.Title);
+                }
+                <h5 class="modal-title" id="videoModalLabel">Video Title : @Title @Id</h5>
+                @* <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="CloseModal"> *@
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Embed your video here -->
+                <div class="embed-responsive embed-responsive-16by9">
+                    @if (!string.IsNullOrEmpty(videoId))
+                    {
+                        <iframe width="560" height="315" src="@($"https://www.youtube.com/embed/{videoId}")" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        Console.WriteLine(videoId);
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private readonly string Official_Trailer = "Official Trailer";
+    private readonly string Trailer = "Trailer";
+    private string videoId;
+    private bool showModal = false;
+    private string ShowModalClass => showModal ? "show d-block" : string.Empty;
+    [Parameter]
+    public Movie Movie { get; set; }
+    public string Title { get; set; }
+    public int Id { get; set; }
+
+
+    private async Task OnClickGetMovie()
+    {
+        Id = this.Movie.Id;
+        Title = this.Movie.Title;
+
+        var movieVideos = await ApiService.GetMovieVideo(Movie.Id);
+        if (movieVideos != null)
+        {
+            foreach (var m in movieVideos)
+            {
+                if (m.Name == Official_Trailer || m.Name == Trailer)
+                {
+                    videoId = m.Key;
+                    break;
+                }
+            }
+        }
+        // Show the modal after fetching the video
+        ShowModal();
+    }
+
+    private void ShowModal()
+    {
+        // Show the modal
+        showModal = true;
+    }
+
+    private void CloseModal()
+    {
+        // Close the modal and reset videoId
+        showModal = false;
+        // videoId = null;
+    }
+
+
+ 
+
+}

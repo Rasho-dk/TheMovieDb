@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -7,8 +7,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Pages\modal.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jokersoft.AspNetCore.WebUtilities" Version="7.0.13" />
+    <PackageReference Include="Microsoft.AspNet.WebPages" Version="3.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.17" PrivateAssets="all" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TheMovieDb.Shared\TheMovieDb.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\modal.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\modal.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Components\VideoModal.razor" />
   </ItemGroup>
 
 </Project>

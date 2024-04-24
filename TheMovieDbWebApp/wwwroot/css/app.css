@@ -1,3 +1,4 @@
+
 h1:focus {
     outline: none;
 }
@@ -30,3 +31,32 @@ h1:focus {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.pop-out {
+    transition: transform 0.5s;
+}
+
+    .pop-out:hover {
+        transform: scale(1.1);
+    }
+
+.card {
+    border-radius: 40px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card-img {
+    border-radius: 10px 40px 0 0;
+    overflow: hidden;
+}

@@ -1,0 +1,36 @@
+﻿<h3>LifeCycle</h3>
+
+
+<ul>
+    @foreach (var item in EventType)
+    {
+        <li>@item</li>
+        <hr />
+    }
+</ul>
+
+@code {
+
+    //This a parent component that will be used to demonstrate the lifecycle of a component in Blazor
+
+    [Parameter]
+    public int CountValue { get; set; }
+
+    List<string> EventType = new List<string>();
+
+
+    protected override void OnInitialized()
+    {
+        EventType.Add("Child - OnInitialized");
+    }
+    //This method is called when the component is initialized and when we want to get values of parameters updated from the parent component. 
+    //based on the parameters went throw the child component  we can update some child component and the state of the child component
+
+    protected override void OnParametersSet()
+    {
+        EventType.Add("Child - OnParametersSet");
+    }
+
+}
+
+

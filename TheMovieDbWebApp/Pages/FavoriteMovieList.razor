@@ -1,0 +1,35 @@
+﻿@page "/favorite-movies"
+@inject IApiService ApiService
+
+<div class="container">
+
+
+    <h3>FavoriteMovieList</h3>
+
+    @if (favoriteMovies == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var movie in favoriteMovies)
+            {
+                <div class="col-md-3 pt-4">
+                    <div class="card" style="width: 18rem;">
+                        <MovieCard Movie="@movie" posterBasePath="@posterBasePath"></MovieCard>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+@code {
+    public string posterBasePath = "https://image.tmdb.org/t/p/w185_and_h278_bestv2";
+
+    private List<Movie?> favoriteMovies;
+
+    protected override async Task OnInitializedAsync() => favoriteMovies = await ApiService.GetFavoriteMovieList();
+
+
+}

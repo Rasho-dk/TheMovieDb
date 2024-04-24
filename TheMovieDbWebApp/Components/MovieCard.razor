@@ -1,0 +1,73 @@
+﻿@using TheMovieDbWebApp.Components
+@inject IApiService ApiService
+
+
+<div class="card" style="width: 18rem;">
+    <!--using String interpolation using $ : https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated-->
+    <div class="card-img">
+        <a href="@($"movie/{Movie.Id}")">
+            <img src="@($"{PosterBasePath}{Movie.Poster_Path.Trim()}")" class="card-img-top mb-3" alt="...">
+        </a>
+    </div>
+    @* <img src="@($"{posterBasePath}{Movie.Poster_Path.Trim()}")" class="card-img-top" alt="..."> *@
+
+    <div class="card-body">
+        @if (Movie.Title is not null)
+        {
+            <h5 class="card-title text-dark">@Movie.Title</h5>
+
+        }
+        <button class="btn btn-outline-secondary" style="border:none;">
+            <span class="far fa-star" aria-hidden="true" @onclick="@(e => OnAddFavoriteMovie(Movie))"></span>
+        </button>
+
+        <div class="d-flex justify-content-between p-0">
+            <p class="card-text text-dark ml-1">@Movie.Vote_Average</p>
+            <p class="far fa-calendar text-dark" aria-hidden="true">@Movie.Release_Date</p>
+        </div>
+        <p class="card-text text-dark">@(Movie?.Overview?.Substring(0, Math.Min(125, Movie.Overview.Length)) + ("...."))</p>
+        <div class="d-flex justify-content-between p-0">
+            <ModalVideo Movie="@Movie" ClickGetMovie="ClickGetMovie">
+                <HeaderContent>
+                    <h5 class="modal-title" id="videoModalLabel">Video Title: @Title</h5>
+                </HeaderContent>
+                <BodyContent>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        @if (!string.IsNullOrEmpty(@Key))
+                        {
+                            <iframe width="560" height="315" src="@($"https://www.youtube.com/embed/{ @Key}")" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        }
+                    </div>
+                </BodyContent>
+            </ModalVideo>
+        </div>
+
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public string PosterBasePath { get; set; }
+    [Parameter]
+    public Movie Movie { get; set; }
+    [Parameter]
+    public string Key { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public EventCallback<int> ClickGetMovie { get; set; }
+    [Parameter]
+    public EventCallback<Movie> ClickAddFavoriteMovie { get; set; }
+    private async Task OnAddFavoriteMovie(Movie movie)
+    {
+        await ClickAddFavoriteMovie.InvokeAsync(movie);
+    }
+    
+
+
+}
+
+
+

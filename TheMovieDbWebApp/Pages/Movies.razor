@@ -1,0 +1,130 @@
+﻿@page "/movies"
+@using Microsoft.AspNetCore.WebUtilities
+@inject IApiService ApiService
+@inject NavigationManager NavigationManager
+
+
+<div class="container">
+
+    <h3>Movies</h3>
+
+    @if (movies == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <Search SearchQueryChanged="@OnChangeSearch" />
+        <div class="row">
+            @foreach (var movie in movies)
+            {
+                <div class="col-md-3 pt-4">
+                    <div class="card" style="width: 18rem;">
+                        <MovieCard PosterBasePath="@posterBasePath" Movie="@movie" ClickGetMovie="OnClickGetMovie" Key="@movieKey" Title="@title" ClickAddFavoriteMovie="OnAddFavoriteMovie"></MovieCard>
+                    </div>
+                </div>
+            }
+        </div>
+        <Pagination CurrentPage="CurrentPage" TotalPages="TotalPages" PageChanged="OnPageChange" />
+    }
+</div>
+
+@code {
+    private readonly string Official_Trailer = "Official Trailer";
+    private readonly string Trailer = "Trailer";
+    private string movieKey;
+    private string title;
+
+    // private string searchTerm = "";
+    private int CurrentPage = 1;
+    private int TotalPages = 1;
+    private List<Movie>? movies;
+    public string posterBasePath = "https://image.tmdb.org/t/p/w185_and_h278_bestv2";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        movies = await ApiService.GetAll();
+
+    }
+
+    private async Task OnChangeSearch(string searchTerm)
+    {
+
+        if (string.IsNullOrEmpty(searchTerm))
+        {
+            movies = await ApiService.GetAll();
+            return; // return to avoid the API call and the foreach loop
+        }
+
+        movies = await ApiService.SearchMovie(searchTerm);
+        movies.ForEach(m =>
+        {
+            m.Poster_Path = string.IsNullOrEmpty(m.Poster_Path) ? "Not Available" : m.Poster_Path;
+            m.Title = string.IsNullOrEmpty(m.Title) ? "Not Available" : m.Title;
+            m.Overview = string.IsNullOrEmpty(m.Overview) ? "Not Available" : m.Overview;
+            m.Release_Date = string.IsNullOrEmpty(m.Release_Date) ? "Not Available" : m.Release_Date;
+        });
+    }
+
+    private async Task OnPageChange(int newPage)
+    {
+        CurrentPage = newPage;
+        movies = await ApiService.GetAll(CurrentPage);
+
+        /*
+        * StateHasChanged is typically called automatically after an event handler has been executed.
+        * Most of the time, you don't need to call it explicitly. But there are some cases where you need to call it manually e.g.
+         when we are going to update timer or a callback from a third-party library (JavaScript library)
+        */
+        // await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnClickGetMovie(int id)
+    {
+        if(id != 0)
+        {
+            title = movies.Find(m => m.Id == id).Title.ToString();
+
+            var movieVideos = await ApiService.GetMovieVideo(id);
+            if (movieVideos != null)
+            {
+                foreach (var m in movieVideos)
+                {
+                    if (m.Name == Official_Trailer || m.Name == Trailer)
+                    {
+                        movieKey = m.Key;
+                        break;
+                    }
+                }
+            }   
+        }
+        else
+        {
+            movieKey = "";
+        }   
+    }
+    private async Task<Movie> OnAddFavoriteMovie(Movie movie)
+    {
+       var result =  await ApiService.AddMovie(movie);
+       return result;
+    }
+
+    #region TODO
+    // private string OnChangeSearchV2()
+    // {
+    //     var uri = new Uri(NavigationManager.Uri);
+
+    //     var query = QueryHelpers.ParseQuery(uri.Query);
+
+    //     if (query.TryGetValue("search", out var searchQuery))
+    //     {
+    //         searchTerm = searchQuery;
+    //     }
+
+    //     return searchTerm;
+    // }
+    #endregion
+
+}
+

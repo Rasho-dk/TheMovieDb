@@ -1,0 +1,52 @@
+﻿
+<div class="pt-3">
+    <ul class="pagination justify-content-center">
+        <li class="page-item">
+            <button class="page-link pop-out" disabled="@IsFirstPage" @onclick="GoToFirstPage" tabindex="-1">First</button>
+        </li>
+        <li class="page-item">
+            <button class="page-link pop-out" disabled="@IsFirstPage" @onclick="GoToPreviousPage" tabindex="-1">Previous</button>
+        </li>
+        <span class="page-link">Page @CurrentPage of @TotalPages</span>
+        <li class="page-item pop-out">
+            <button class="page-link pop-out" @onclick="GoToNextPage">Next</button>
+        </li>
+    </ul>
+</div>
+
+@code {
+    [Parameter]
+    public int CurrentPage { get; set; }
+    [Parameter]
+    public int TotalPages { get; set; }
+    [Parameter]
+    public EventCallback<int> PageChanged { get; set; }
+
+    private bool IsFirstPage => CurrentPage == 1;
+    private bool IsLastPage => CurrentPage == TotalPages;
+
+    private async Task GoToFirstPage()
+    {
+        await PageChanged.InvokeAsync(1);
+    }
+
+    private async Task GoToPreviousPage()
+    {
+        await PageChanged.InvokeAsync(CurrentPage - 1);
+    }
+    private async Task GoToNextPage()
+    {
+        await PageChanged.InvokeAsync(CurrentPage + 1);
+    }
+
+    private async Task GoToLastPage()
+    {
+        await PageChanged.InvokeAsync(TotalPages);
+    }
+
+
+
+
+
+
+}

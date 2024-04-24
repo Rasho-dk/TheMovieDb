@@ -1,11 +1,25 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using System.Net.Http.Headers;
 using TheMovieDbWebApp;
+using TheMovieDbWebApp.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
+var configuration = builder.Configuration;
+var apiSettings = configuration.GetSection("ApiSettings");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddScoped(sp =>
+{
+    var httpClient = new HttpClient { BaseAddress = new Uri(apiSettings["BaseUrl"]) };
+    httpClient.DefaultRequestHeaders.Accept.Clear();
+    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiSettings["Token"]);
+    return httpClient;
+});
+
+
+builder.Services.AddScoped<IApiService, ApiService>(); //AddScoped is used to create a new instance of the service for each component that needs it
 
 await builder.Build().RunAsync();
