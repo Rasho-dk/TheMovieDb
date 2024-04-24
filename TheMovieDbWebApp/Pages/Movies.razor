@@ -20,7 +20,9 @@
             {
                 <div class="col-md-3 pt-4">
                     <div class="card" style="width: 18rem;">
-                        <MovieCard PosterBasePath="@posterBasePath" Movie="@movie" ClickGetMovie="OnClickGetMovie" Key="@movieKey" Title="@title" ClickAddFavoriteMovie="OnAddFavoriteMovie"></MovieCard>
+                        <MovieCard PosterBasePath="@posterBasePath" Movie="@movie" Key="@movieKey" Title="@title" ClickGetMovie="OnClickGetMovie"
+                            ClickAddFavoriteMovie="OnAddFavoriteMovie" ClickRemoveFavoriteMovie="OnRemoveFavorite">
+                        </MovieCard>
                     </div>
                 </div>
             }
@@ -82,7 +84,7 @@
 
     private async Task OnClickGetMovie(int id)
     {
-        if(id != 0)
+        if (id != 0)
         {
             title = movies.Find(m => m.Id == id).Title.ToString();
 
@@ -97,17 +99,22 @@
                         break;
                     }
                 }
-            }   
+            }
         }
         else
         {
             movieKey = "";
-        }   
+        }
     }
     private async Task<Movie> OnAddFavoriteMovie(Movie movie)
     {
-       var result =  await ApiService.AddMovie(movie);
-       return result;
+        var result = await ApiService.AddMovie(movie);
+        return result;
+    }
+    private async Task<Movie> OnRemoveFavorite(Movie movie)
+    {
+        var result = await ApiService.RemoveMovie(movie.Id);
+        return result;
     }
 
     #region TODO

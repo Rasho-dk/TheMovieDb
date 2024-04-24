@@ -4,12 +4,12 @@
 
 <div class="card" style="width: 18rem;">
     <!--using String interpolation using $ : https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated-->
-    <div class="card-img">
+   @*  <div class="card-img">
         <a href="@($"movie/{Movie.Id}")">
             <img src="@($"{PosterBasePath}{Movie.Poster_Path.Trim()}")" class="card-img-top mb-3" alt="...">
         </a>
-    </div>
-    @* <img src="@($"{posterBasePath}{Movie.Poster_Path.Trim()}")" class="card-img-top" alt="..."> *@
+    </div> *@
+    <img src="@($"{PosterBasePath}{Movie.Poster_Path.Trim()}")" class="card-img-top" alt="...">
 
     <div class="card-body">
         @if (Movie.Title is not null)
@@ -17,10 +17,20 @@
             <h5 class="card-title text-dark">@Movie.Title</h5>
 
         }
-        <button class="btn btn-outline-secondary" style="border:none;">
-            <span class="far fa-star" aria-hidden="true" @onclick="@(e => OnAddFavoriteMovie(Movie))"></span>
-        </button>
-
+        @if(movies?.Any(m => m.Id == Movie.Id) == false)
+        {
+            <!--If movie not found in favorite list-->
+            <button class="btn btn-outline-secondary" style="border:none;">
+                <span class="far fa-star" aria-hidden="true" @onclick="@(e => OnAddFavoriteMovie(Movie))"></span>
+            </button>
+        }
+        else
+        {
+            <!--If movie found in favorite list-->
+            <button class="btn btn-outline-secondary" style="border:none;">
+                <span class="fas fa-star" aria-hidden="true" @onclick=@(e => OnRemoveFavorite(Movie))></span>
+            </button>
+        }
         <div class="d-flex justify-content-between p-0">
             <p class="card-text text-dark ml-1">@Movie.Vote_Average</p>
             <p class="far fa-calendar text-dark" aria-hidden="true">@Movie.Release_Date</p>
@@ -60,11 +70,23 @@
     public EventCallback<int> ClickGetMovie { get; set; }
     [Parameter]
     public EventCallback<Movie> ClickAddFavoriteMovie { get; set; }
+    [Parameter]
+    public EventCallback<Movie> ClickRemoveFavoriteMovie { get; set; }
+
+    private List<Movie?> movies;
     private async Task OnAddFavoriteMovie(Movie movie)
     {
         await ClickAddFavoriteMovie.InvokeAsync(movie);
     }
-    
+    private async Task OnRemoveFavorite(Movie movie)
+    {
+        await ClickRemoveFavoriteMovie.InvokeAsync(movie);
+    }
+    //This method is called when the component is initialized from the parent component for the each time the component is rendered
+    protected override async Task<List<Movie?>> OnParametersSetAsync()
+    {
+        return movies = await ApiService.GetFavoriteMovieList();
+    }
 
 
 }

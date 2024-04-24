@@ -9,5 +9,6 @@ namespace TheMovieDbWebApp.Services
         Task<List<MovieVideo>> GetMovieVideo(int id);
         Task<Movie> AddMovie(Movie movie);
         Task<List<Movie?>> GetFavoriteMovieList();
+        Task<Movie?> RemoveMovie(int id);
     }
 }

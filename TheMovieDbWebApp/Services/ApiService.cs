@@ -131,12 +131,14 @@ namespace TheMovieDbWebApp.Services
             }
         }
         public async Task<Movie> AddMovie(Movie movie)
-        {
-            Dictionary<string, object> headers = new Dictionary<string, object>();
+        {   
             var httpClient = new HttpClient();
             var json = JsonConvert.SerializeObject(movie); // Serialize the movie object to a JSON string
-            var jsonObj = JObject.Parse(json).Property("Id").Name.ToLower();// Get the JSON object from the JSON string and convert the property name to lowercase.  
-            json = json.Replace("Id", jsonObj);               
+            var jsonObj = JObject.Parse(json);// Get the JSON object from the JSON string and convert the property name to lowercase.  
+            jsonObj["Id"] = Convert.ToString(jsonObj["Id"]); // Convert the Id property to a string
+            string updatedJson = jsonObj.ToString();
+            json = updatedJson.Replace("Id", jsonObj.Property("Id").Name.ToLower());
+
             var content = new StringContent(json, Encoding.UTF8, "application/json"); // Create a new StringContent object from the JSON string
             var response = await httpClient.PostAsync("http://localhost:3001/results", content); // Send a POST request to the API Controller with the JSON string
             var result = await response.Content.ReadAsStringAsync();
@@ -153,6 +155,18 @@ namespace TheMovieDbWebApp.Services
             var response = await httpClient.GetAsync("http://localhost:3001/results");
             var json = await response.Content.ReadAsStringAsync();
             return response.IsSuccessStatusCode ? JsonConvert.DeserializeObject<List<Movie>>(json) : null;
+        }
+
+        public Task<Movie?> RemoveMovie(int id)
+        {
+            var httpClient = new HttpClient();
+            return httpClient.DeleteAsync($"http://localhost:3001/results/{id}")
+                .ContinueWith(response =>
+                {
+                    var result = response.Result.Content.ReadAsStringAsync().Result;
+                    var json = JsonConvert.DeserializeObject<Movie>(result);
+                    return response.Result.IsSuccessStatusCode ? json : null;
+                });
         }
     }
 }
