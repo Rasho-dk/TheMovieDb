@@ -10,6 +10,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 var configuration = builder.Configuration;
 var apiSettings = configuration.GetSection("ApiSettings");
 
+
 builder.Services.AddScoped(sp =>
 {
     var httpClient = new HttpClient { BaseAddress = new Uri(apiSettings["BaseUrl"]) };
@@ -18,8 +19,6 @@ builder.Services.AddScoped(sp =>
     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiSettings["Token"]);
     return httpClient;
 });
-
-
 builder.Services.AddScoped<IApiService, ApiService>(); //AddScoped is used to create a new instance of the service for each component that needs it
 
 await builder.Build().RunAsync();

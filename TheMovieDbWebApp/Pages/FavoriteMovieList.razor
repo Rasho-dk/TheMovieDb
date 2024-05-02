@@ -1,5 +1,6 @@
 ﻿@page "/favorite-movies"
-@inject IApiService ApiService
+
+<PageTitle>Favorite Movies</PageTitle>
 
 <div class="container">
 
@@ -32,6 +33,9 @@
    
 </div>
 @code {
+    [Inject]
+    public IApiService ApiService { get; set; }
+
     public string posterBasePath = "https://image.tmdb.org/t/p/w185_and_h278_bestv2";
 
     private List<Movie?> favoriteMovies;

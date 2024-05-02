@@ -1,8 +1,7 @@
 ﻿@page "/movies"
-@using Microsoft.AspNetCore.WebUtilities
-@inject IApiService ApiService
-@inject NavigationManager NavigationManager
 
+
+<PageTitle>Movies</PageTitle>
 
 <div class="container">
 
@@ -43,10 +42,25 @@
     private List<Movie>? movies;
     public string posterBasePath = "https://image.tmdb.org/t/p/w185_and_h278_bestv2";
 
+    [Inject]
+    public IApiService ApiService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        movies = await ApiService.GetAll();
+        if(movies == null)
+        {
+
+            try
+            {
+                movies = await ApiService.GetAll();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        // movies = await ApiService.GetAll();
 
     }
 
@@ -118,6 +132,10 @@
     }
 
     #region TODO
+    /*
+     * @using Microsoft.AspNetCore.WebUtilities
+     * @inject NavigationManager NavigationManager
+    */
     // private string OnChangeSearchV2()
     // {
     //     var uri = new Uri(NavigationManager.Uri);

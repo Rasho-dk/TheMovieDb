@@ -5,10 +5,9 @@ using TheMovieDb.Shared.Models;
 using NetJSON;
 using static TheMovieDb.Shared.Models.MovieVideo;
 using System.Text;
-using System.Runtime.InteropServices.JavaScript;
-using System.Text.Json.Nodes;
 using Newtonsoft.Json.Linq;
-using System.Linq;
+using System.Net.Http;
+using System.Web.Http;
 
 namespace TheMovieDbWebApp.Services
 {
@@ -23,6 +22,7 @@ namespace TheMovieDbWebApp.Services
 
         public async Task<List<Movie>> GetAll(int? newPage = null)
         {
+
             var response = await _httpClient.GetAsync(newPage.HasValue ? $"discover/movie?page={newPage}" : "discover/movie");
             if (response.IsSuccessStatusCode)
             {
@@ -39,8 +39,13 @@ namespace TheMovieDbWebApp.Services
             }
             else
             {
+                throw new HttpResponseException(response);
                 return null;
             }
+
+
+
+
             #region Old Code
             //using(var client = new HttpClient())
             //{
@@ -131,7 +136,7 @@ namespace TheMovieDbWebApp.Services
             }
         }
         public async Task<Movie> AddMovie(Movie movie)
-        {   
+        {
             var httpClient = new HttpClient();
             var json = JsonConvert.SerializeObject(movie); // Serialize the movie object to a JSON string
             var jsonObj = JObject.Parse(json);// Get the JSON object from the JSON string and convert the property name to lowercase.  
