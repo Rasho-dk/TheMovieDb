@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheMovieDbWebApp", "TheMovi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheMovieDb.Shared", "TheMovieDb.Shared\TheMovieDb.Shared.csproj", "{713344F5-53E2-42EE-964E-928CDA5F2C8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WsamTest", "WsamTest\WsamTest.csproj", "{2D9DE657-CB15-468C-AC63-C105A839A732}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WsamTest", "WsamTest\WsamTest.csproj", "{2D9DE657-CB15-468C-AC63-C105A839A732}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

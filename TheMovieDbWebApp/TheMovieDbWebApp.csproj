@@ -32,10 +32,6 @@
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Pages\modal.razor" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Components\Akiv.razor" />
-  </ItemGroup>
 	
 	<ItemGroup>
 		<ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
