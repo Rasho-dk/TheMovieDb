@@ -29,7 +29,6 @@
     {
         await PageChanged.InvokeAsync(1);
     }
-
     private async Task GoToPreviousPage()
     {
         await PageChanged.InvokeAsync(CurrentPage - 1);
