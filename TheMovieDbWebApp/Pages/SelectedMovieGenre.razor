@@ -1,0 +1,25 @@
+﻿@page "/selectedmoviegenre/{genreId}"
+@using System.Text.RegularExpressions
+
+
+
+@code {
+    private List<Movie> movies;
+    private int id;
+    [Inject]
+    public IApiServiceGetWithParam<Movie> ApiService { get; set; }
+
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     id = int.Parse(Regex.Match(NavigationManager.Uri, @"\d+").Value);
+    //     movies = await ApiService.GetAsync(id: id);
+    //     genres = await ApiServiceGenre.GetAsync();
+    // }
+    // private async Task OnChangeGenre(int id)
+    // {
+
+    //     NavigationManager.NavigateTo($"/selectedmoviegenre/{id}");
+    // }
+
+}

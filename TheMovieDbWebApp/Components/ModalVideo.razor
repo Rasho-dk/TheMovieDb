@@ -1,4 +1,4 @@
-﻿@inject IApiService ApiService
+﻿@* @inject IApiService ApiService *@
 
 <!-- Button to trigger the modal -->
 @*symbol ! :  compiler to assume that the Movie property will never be null, even if the type of Movie allows null values.*@
@@ -23,6 +23,9 @@
 </div>
 
 @code {
+    // [Inject] 
+    // public IApiService ApiService { get; set; }
+
     [Parameter]
     public Movie? Movie { get; set; }
     [Parameter]

@@ -8,6 +8,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using TheMovieDbWebApp.Services.IService;
 
 namespace TheMovieDbWebApp.Services
 {
@@ -149,7 +150,6 @@ namespace TheMovieDbWebApp.Services
             var result = await response.Content.ReadAsStringAsync();
             var obj = JsonConvert.DeserializeObject<Movie>(result);
             return response.IsSuccessStatusCode ? obj : null;
-
 
 
         }

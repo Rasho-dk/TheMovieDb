@@ -1,5 +1,5 @@
 ﻿@using TheMovieDbWebApp.Components
-@inject IApiService ApiService
+@* @inject IApiService ApiService *@
 
 
 <div class="card" style="width: 18rem;">
@@ -51,7 +51,6 @@
                 </BodyContent>
             </ModalVideo>
         </div>
-
     </div>
 </div>
 
@@ -72,6 +71,8 @@
     public EventCallback<Movie> ClickAddFavoriteMovie { get; set; }
     [Parameter]
     public EventCallback<Movie> ClickRemoveFavoriteMovie { get; set; }
+    [Inject]
+    public IApiServiceGet<Movie> ApiService { get; set; }
 
     private List<Movie?> movies;
     private async Task OnAddFavoriteMovie(Movie movie)
@@ -85,7 +86,7 @@
     //This method is called when the component is initialized from the parent component for the each time the component is rendered
     protected override async Task<List<Movie?>> OnParametersSetAsync()
     {
-        return movies = await ApiService.GetFavoriteMovieList();
+        return movies = await ApiService.GetAsync();
     }
 
 

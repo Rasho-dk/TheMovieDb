@@ -1,6 +1,6 @@
 ﻿using TheMovieDb.Shared.Models;
 
-namespace TheMovieDbWebApp.Services
+namespace TheMovieDbWebApp.Services.IService
 {
     public interface IApiService
     {

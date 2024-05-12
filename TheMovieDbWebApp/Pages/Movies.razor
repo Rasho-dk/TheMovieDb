@@ -1,5 +1,7 @@
 ﻿@page "/movies"
-
+@* @page "/movies/{genreId:int}"
+ *@
+@using System.Text.RegularExpressions
 
 <PageTitle>Movies</PageTitle>
 
@@ -13,14 +15,23 @@
     }
     else
     {
-        <Search SearchQueryChanged="@OnChangeSearch" />
+
+        <div class="d-flex">
+            <Search SearchQueryChanged="@OnChangeSearch" />
+            @if (!string.IsNullOrEmpty(genreName))
+            {
+                <button type="button" class="btn btn-secondary mx-3" @onclick="ResetParams">Genre: @genreName</button>
+            }
+        </div>
+
+
         <div class="row">
             @foreach (var movie in movies)
             {
                 <div class="col-md-3 pt-4">
                     <div class="card" style="width: 18rem;">
                         <MovieCard PosterBasePath="@posterBasePath" Movie="@movie" Key="@movieKey" Title="@title" ClickGetMovie="OnClickGetMovie"
-                            ClickAddFavoriteMovie="OnAddFavoriteMovie" ClickRemoveFavoriteMovie="OnRemoveFavorite">
+                                   ClickAddFavoriteMovie="OnAddFavoriteMovie" ClickRemoveFavoriteMovie="OnRemoveFavorite">
                         </MovieCard>
                     </div>
                 </div>
@@ -35,6 +46,11 @@
     private readonly string Trailer = "Trailer";
     private string movieKey;
     private string title;
+    //Genre Id
+    private int id;
+    //Genre Name
+    private string genreName;
+
 
     // private string searchTerm = "";
     private int CurrentPage = 1;
@@ -43,37 +59,47 @@
     public string posterBasePath = "https://image.tmdb.org/t/p/w185_and_h278_bestv2";
 
     [Inject]
-    public IApiService ApiService { get; set; }
+    public IApiServiceGetWithParam<Movie> ApiService { get; set; }
+    [Inject]
+    public IApiServiceGetWithParam<MovieVideo> ApiServiceMovieVideo { get; set; }
+    [Inject]
+    public IApiServiceAdd<Movie> ApiServiceAdd { get; set; }
+    [Inject]
+    public IApiServiceRemove<Movie> ApiServiceRemove { get; set; }
+    [Inject]
+    public NavigationManager NavigationManager { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        if(movies == null)
+        LoadParams();
+        if (id != 0)
         {
-
+            movies = await ApiService.GetAsync(id: id);
+        }
+        if (movies == null)
+        {
             try
             {
-                movies = await ApiService.GetAll();
+                movies = await ApiService.GetAsync();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
-
-        // movies = await ApiService.GetAll();
-
     }
+
 
     private async Task OnChangeSearch(string searchTerm)
     {
 
         if (string.IsNullOrEmpty(searchTerm))
         {
-            movies = await ApiService.GetAll();
+            movies = await ApiService.GetAsync();
             return; // return to avoid the API call and the foreach loop
         }
 
-        movies = await ApiService.SearchMovie(searchTerm);
+        movies = await ApiService.GetAsync(query: searchTerm);
         movies.ForEach(m =>
         {
             m.Poster_Path = string.IsNullOrEmpty(m.Poster_Path) ? "Not Available" : m.Poster_Path;
@@ -82,11 +108,18 @@
             m.Release_Date = string.IsNullOrEmpty(m.Release_Date) ? "Not Available" : m.Release_Date;
         });
     }
-
     private async Task OnPageChange(int newPage)
     {
         CurrentPage = newPage;
-        movies = await ApiService.GetAll(CurrentPage);
+        if (id != 0)
+        {
+            movies = await ApiService.GetAsync(newPage: CurrentPage, id: id);
+        }
+        else
+        {
+            movies = await ApiService.GetAsync(newPage: CurrentPage);
+        }
+        // movies = await ApiService.GetAsync(CurrentPage);
 
         /*
         * StateHasChanged is typically called automatically after an event handler has been executed.
@@ -95,14 +128,14 @@
         */
         // await InvokeAsync(StateHasChanged);
     }
-
     private async Task OnClickGetMovie(int id)
     {
         if (id != 0)
         {
             title = movies.Find(m => m.Id == id).Title.ToString();
 
-            var movieVideos = await ApiService.GetMovieVideo(id);
+            var movieVideos = await ApiServiceMovieVideo.GetAsync(id: id);
+
             if (movieVideos != null)
             {
                 foreach (var m in movieVideos)
@@ -122,19 +155,39 @@
     }
     private async Task<Movie> OnAddFavoriteMovie(Movie movie)
     {
-        var result = await ApiService.AddMovie(movie);
+        var result = await ApiServiceAdd.AddAsync(movie);
         return result;
     }
     private async Task<Movie> OnRemoveFavorite(Movie movie)
     {
-        var result = await ApiService.RemoveMovie(movie.Id);
+        var result = await ApiServiceRemove.RemoveAsync(movie.Id);
         return result;
+    }
+
+
+    private void LoadParams()
+    {
+        var uri = new Uri(NavigationManager.Uri); //Get the current URL
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query); //Parse the query string
+        if (query.TryGetValue("genreId", out var genreId) && query.TryGetValue("genreName", out var genreName))
+        {
+            id = int.Parse(Regex.Match(genreId, @"\d+").Value);
+            this.genreName = genreName;
+
+        }
+    }
+
+    private void ResetParams()
+    {
+        id = 0;
+        genreName = "";
+        NavigationManager.NavigateTo("/movies", forceLoad: true);
     }
 
     #region TODO
     /*
-     * @using Microsoft.AspNetCore.WebUtilities
-     * @inject NavigationManager NavigationManager
+    * @using Microsoft.AspNetCore.WebUtilities
+    * @inject NavigationManager NavigationManager
     */
     // private string OnChangeSearchV2()
     // {

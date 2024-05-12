@@ -24,6 +24,8 @@ namespace TheMovieDb.Shared.Models
         public string Release_Date { get; set; }
         [JsonPropertyName("vote_average")]
         public double Vote_Average { get; set; }
+        [JsonPropertyName("genre_ids")]
+        public List<int> Genre_Ids { get; set; }
 
         public Movie()
         {

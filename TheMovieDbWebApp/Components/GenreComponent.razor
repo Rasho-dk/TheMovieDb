@@ -1,0 +1,49 @@
+﻿@using System.Text.RegularExpressions
+@inherits LayoutComponentBase
+<form>
+    <label>
+        <select class="nav-link dropdown-toggle" aria-label="movie genre" id="movieGenre" @onchange="@(e => OnChangeGenre(int.Parse(e.Value.ToString())))">
+            <option class="dropdown-item text-dark" selected>Movie Genre</option>
+
+            @if (genres is { }) //if genres is not null, symbol {} is used to check if the genres is not empty as an empty list/obj
+                @foreach (var genre in genres)
+                {
+                    <option class="dropdown-item text-dark" value="@genre.Id">@genre.Name</option>
+                }
+            else
+            {
+                <option class="dropdown-item text-dark" value="0">Loading...</option>
+
+            }
+        </select>
+    </label>
+</form>
+
+
+@code {
+    private string genreName;
+    private List<Genre> genres;
+    private List<Movie> movies;
+    [Inject]
+    public IApiServiceGet<Genre> ApiService { get; set; }
+    [Inject]
+    public IApiServiceGetWithParam<Movie> ApiServiceMovie { get; set; }
+    [Inject]
+    public NavigationManager NavigationManager { get; set; } = default!;
+
+    // [Parameter]
+    // public EventCallback<int> ClickGetGenre { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        genres = await ApiService.GetAsync();
+    }
+    
+    private async Task OnChangeGenre(int id)
+    {
+        genreName = genres.Where(g => g.Id == id).FirstOrDefault().Name;
+        NavigationManager.NavigateTo($"/movies?genreId={id}&genreName={genreName}", forceLoad: true);
+    }
+
+
+
+}

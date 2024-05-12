@@ -34,19 +34,21 @@
 </div>
 @code {
     [Inject]
-    public IApiService ApiService { get; set; }
+    public IApiServiceGet<Movie> ApiService { get; set; }
+    [Inject]
+    public IApiServiceRemove<Movie> ApiServiceRemove { get; set; }
 
     public string posterBasePath = "https://image.tmdb.org/t/p/w185_and_h278_bestv2";
 
     private List<Movie?> favoriteMovies;
 
-    protected override async Task OnInitializedAsync() => favoriteMovies = await ApiService.GetFavoriteMovieList();
+    protected override async Task OnInitializedAsync() => favoriteMovies = await ApiService.GetAsync();
 
    
 
     private async Task<Movie> OnRemoveFavorite(Movie movie)
     {
-        var result = await ApiService.RemoveMovie(movie.Id);
+        var result = await ApiServiceRemove.RemoveAsync(movie.Id);
         if(result != null)
         {
             favoriteMovies.Remove(movie);
