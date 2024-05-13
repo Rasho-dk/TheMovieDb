@@ -36,11 +36,14 @@
     private async Task GoToNextPage()
     {
         await PageChanged.InvokeAsync(CurrentPage + 1);
+        await JSRuntime.InvokeVoidAsync("window.scrollTo", 0, 0);
     }
 
     private async Task GoToLastPage()
     {
         await PageChanged.InvokeAsync(TotalPages);
+         
+
     }
 
 

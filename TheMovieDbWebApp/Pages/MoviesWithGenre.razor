@@ -1,6 +1,8 @@
-﻿@page "/movies"
+﻿@page "/movieswithgenre/{genreId:int}/{genreName}"
 
 <PageTitle>Movies</PageTitle>
+
+
 
 <div class="container">
 
@@ -14,8 +16,10 @@
     {
 
         <div class="d-flex">
-            <Search SearchQueryChanged="@OnChangeSearch" />
-
+            @if (!string.IsNullOrEmpty(GenreName))
+            {
+                <button type="button" class="btn btn-secondary mx-3">Genre: @GenreName</button>
+            }
         </div>
 
 
@@ -36,6 +40,12 @@
 </div>
 
 @code {
+    [Parameter]
+    public int GenreId { get; set; }
+    [Parameter]
+    public string GenreName { get; set; }
+
+
     private readonly string Official_Trailer = "Official Trailer";
     private readonly string Trailer = "Trailer";
     private string movieKey;
@@ -58,53 +68,29 @@
     [Inject]
     public NavigationManager NavigationManager { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     // LoadParams();
+    //     if (GenreId != 0)
+    //     {
+    //         movies = await ApiService.GetAsync(id: GenreId);
+    //     }
+    // }
+    protected override async Task OnParametersSetAsync()
     {
-        if (movies == null)
+        if (GenreId != 0)
         {
-            try
-            {
-                movies = await ApiService.GetAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            movies = await ApiService.GetAsync(id: GenreId);
         }
-    }
-
-
-    private async Task OnChangeSearch(string searchTerm)
-    {
-
-        if (string.IsNullOrEmpty(searchTerm))
-        {
-            movies = await ApiService.GetAsync();
-            return; // return to avoid the API call and the foreach loop
-        }
-
-        movies = await ApiService.GetAsync(query: searchTerm);
-        movies.ForEach(m =>
-        {
-            m.Poster_Path = string.IsNullOrEmpty(m.Poster_Path) ? "Not Available" : m.Poster_Path;
-            m.Title = string.IsNullOrEmpty(m.Title) ? "Not Available" : m.Title;
-            m.Overview = string.IsNullOrEmpty(m.Overview) ? "Not Available" : m.Overview;
-            m.Release_Date = string.IsNullOrEmpty(m.Release_Date) ? "Not Available" : m.Release_Date;
-        });
     }
     private async Task OnPageChange(int newPage)
     {
         CurrentPage = newPage;
-        movies = await ApiService.GetAsync(newPage: CurrentPage);
+        if (GenreId != 0)
+        {
+            movies = await ApiService.GetAsync(newPage: CurrentPage, id: GenreId);
+        }
 
-        // movies = await ApiService.GetAsync(CurrentPage);
-
-        /*
-        * StateHasChanged is typically called automatically after an event handler has been executed.
-        * Most of the time, you don't need to call it explicitly. But there are some cases where you need to call it manually e.g.
-         when we are going to update timer or a callback from a third-party library (JavaScript library)
-        */
-        // await InvokeAsync(StateHasChanged);
     }
     private async Task OnClickGetMovie(int id)
     {
@@ -131,19 +117,11 @@
             movieKey = "";
         }
     }
+
     private async Task<Movie> OnAddFavoriteMovie(Movie movie)
     {
-        try
-        {
-            var result = await ApiServiceAdd.AddAsync(movie);
-            return result;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return null;
-        }
-    
+        var result = await ApiServiceAdd.AddAsync(movie);
+        return result;
     }
     private async Task<Movie> OnRemoveFavorite(Movie movie)
     {
@@ -152,27 +130,17 @@
     }
 
 
-
-
-    #region TODO
-    /*
-    * @using Microsoft.AspNetCore.WebUtilities
-    * @inject NavigationManager NavigationManager
-    */
-    // private string OnChangeSearchV2()
+    // private void LoadParams()
     // {
-    //     var uri = new Uri(NavigationManager.Uri);
-
-    //     var query = QueryHelpers.ParseQuery(uri.Query);
-
-    //     if (query.TryGetValue("search", out var searchQuery))
+    //     var uri = new Uri(NavigationManager.Uri); //Get the current URL
+    //     var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query); //Parse the query string
+    //     if (query.TryGetValue("genreId", out var genreId) && query.TryGetValue("genreName", out var genreName))
     //     {
-    //         searchTerm = searchQuery;
-    //     }
+    //         id = int.Parse(Regex.Match(genreId, @"\d+").Value);
+    //         this.genreName = genreName;
 
-    //     return searchTerm;
+    //     }
     // }
-    #endregion
+
 
 }
-
